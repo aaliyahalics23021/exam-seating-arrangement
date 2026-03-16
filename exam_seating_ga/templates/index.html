@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Genetic Algorithm for Exam Seating Arrangement Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-950 via-slate-950 to-purple-950 text-white">
+    <div class="absolute inset-0 pointer-events-none opacity-40">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+
+    <main class="relative mx-auto max-w-6xl px-6 py-14">
+      <div class="glass rounded-3xl p-8 md:p-12">
+        <div class="flex flex-col gap-10 md:flex-row md:items-center md:justify-between">
+          <div class="max-w-2xl">
+            <p class="text-sm font-semibold tracking-widest text-sky-200/90">AI-POWERED OPTIMIZATION DEMO</p>
+            <h1 class="mt-3 text-3xl md:text-5xl font-extrabold leading-tight">
+              Genetic Algorithm for Exam Seating Arrangement Optimization
+            </h1>
+            <p class="mt-5 text-white/80 leading-relaxed">
+              Automatically generates an exam hall seating plan that <span class="text-emerald-200 font-semibold">minimizes subject clashes</span>
+              by evolving a population of seating arrangements (chromosomes) using <span class="text-sky-200 font-semibold">tournament selection</span>,
+              <span class="text-sky-200 font-semibold">single-point crossover</span>, and <span class="text-sky-200 font-semibold">swap mutation</span>.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a
+                href="{{ url_for('input_page') }}"
+                class="btn-primary"
+              >
+                Start Optimization
+              </a>
+              <a
+                href="{{ url_for('download_sample') }}"
+                class="btn-secondary"
+              >
+                Download Sample CSV
+              </a>
+            </div>
+          </div>
+
+          <div class="w-full md:w-[380px]">
+            <div class="glass rounded-2xl p-6">
+              <h2 class="text-lg font-bold">What you’ll see</h2>
+              <ul class="mt-4 space-y-3 text-sm text-white/80">
+                <li><span class="font-semibold text-white">Chromosome:</span> ordered list of students mapped to seats</li>
+                <li><span class="font-semibold text-white">Fitness:</span> total seats minus clash penalties</li>
+                <li><span class="font-semibold text-white">Chart:</span> best & average fitness across generations</li>
+                <li><span class="font-semibold text-white">Comparison:</span> random vs optimized seating grids</li>
+              </ul>
+              <div class="mt-6 rounded-xl bg-white/5 p-4 border border-white/10">
+                <p class="text-xs text-white/70">
+                  Clash rule: adjacent seats (horizontal/vertical) with the <span class="text-rose-200 font-semibold">same subject</span> are flagged.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-3">
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold">Input</h3>
+          <p class="mt-2 text-sm text-white/75">Upload a CSV of students or use a sample dataset.</p>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold">Evolve</h3>
+          <p class="mt-2 text-sm text-white/75">Run 100 generations and watch fitness improve.</p>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold">Visualize</h3>
+          <p class="mt-2 text-sm text-white/75">See clash hotspots with red borders and subject tags.</p>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+

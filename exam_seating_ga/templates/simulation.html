@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulation • Genetic Algorithm Seating Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-950 via-slate-950 to-purple-950 text-white">
+    <main class="relative mx-auto max-w-7xl px-6 py-10">
+      <div class="flex items-center justify-between gap-4 flex-wrap">
+        <a href="{{ url_for('input_page') }}" class="text-sm text-white/80 hover:text-white">← Back to input</a>
+        <div class="text-xs text-white/60">Data source: <span class="text-white/80 font-semibold">{{ source_name }}</span></div>
+      </div>
+
+      <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        <section class="glass rounded-3xl p-6 lg:col-span-2">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h1 class="text-2xl md:text-3xl font-extrabold">Population Evolution</h1>
+              <p class="mt-1 text-sm text-white/70">
+                Best vs Average fitness across generations (higher is better).
+              </p>
+            </div>
+            <div class="rounded-2xl bg-emerald-500/10 border border-emerald-400/30 px-4 py-2">
+              <div class="text-xs text-emerald-100/80">Best Fitness</div>
+              <div class="text-lg font-extrabold text-emerald-100"><span class="counter" data-target="{{ best_fitness|round(2) }}">0</span></div>
+            </div>
+          </div>
+
+          <div class="mt-5 rounded-2xl bg-white/5 border border-white/10 p-4">
+            <canvas id="fitnessChart" height="120"></canvas>
+          </div>
+
+          <div class="mt-6 grid gap-4 md:grid-cols-4">
+            <div class="glass-soft rounded-2xl p-4">
+              <div class="text-xs text-white/60">Total Students</div>
+              <div class="text-2xl font-extrabold"><span class="counter" data-target="{{ total_students }}">0</span></div>
+            </div>
+            <div class="glass-soft rounded-2xl p-4">
+              <div class="text-xs text-white/60">Total Seats</div>
+              <div class="text-2xl font-extrabold"><span class="counter" data-target="{{ total_seats }}">0</span></div>
+            </div>
+            <div class="glass-soft rounded-2xl p-4">
+              <div class="text-xs text-white/60">Population Size</div>
+              <div class="text-2xl font-extrabold"><span class="counter" data-target="{{ population_size }}">0</span></div>
+            </div>
+            <div class="glass-soft rounded-2xl p-4">
+              <div class="text-xs text-white/60">Generations</div>
+              <div class="text-2xl font-extrabold"><span class="counter" data-target="{{ generations_executed }}">0</span></div>
+            </div>
+          </div>
+        </section>
+
+        <aside class="glass rounded-3xl p-6">
+          <h2 class="text-lg font-bold">Algorithm Explanation</h2>
+          <ol class="mt-4 space-y-3 text-sm text-white/75">
+            <li class="flex gap-3">
+              <span class="step-badge">1</span>
+              <div><span class="font-semibold text-white">Population Initialization</span><br />Random seating plans (chromosomes).</div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-badge">2</span>
+              <div><span class="font-semibold text-white">Fitness Evaluation</span><br />Penalize same-subject adjacency (H/V) and duplicates.</div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-badge">3</span>
+              <div><span class="font-semibold text-white">Tournament Selection</span><br />Pick the best of random mini-groups.</div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-badge">4</span>
+              <div><span class="font-semibold text-white">Single-Point Crossover</span><br />Prefix from one parent, fill remainder from the other.</div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-badge">5</span>
+              <div><span class="font-semibold text-white">Mutation</span><br />Swap two students (~5%).</div>
+            </li>
+            <li class="flex gap-3">
+              <span class="step-badge">6</span>
+              <div><span class="font-semibold text-white">Optimized Seating</span><br />Best chromosome after evolution.</div>
+            </li>
+          </ol>
+
+          <div class="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-white/70">
+            <div class="font-semibold text-white/85 mb-2">Legend</div>
+            <div class="flex flex-col gap-2">
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-3 w-3 rounded bg-white/25 border border-white/20"></span>
+                Empty seat
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-3 w-3 rounded bg-emerald-500/60 border border-emerald-300/40"></span>
+                Optimized result highlight
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-block h-3 w-3 rounded bg-rose-500/50 border border-rose-300/60"></span>
+                Clash seat (same-subject adjacency)
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="mt-6 glass rounded-3xl p-6">
+        <div class="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h2 class="text-xl font-extrabold">Random vs Optimized Seating</h2>
+            <p class="mt-1 text-sm text-white/70">
+              Left is the initial random seating (baseline). Right is the GA-optimized seating.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="rounded-2xl bg-white/5 border border-white/10 px-4 py-3">
+              <div class="text-xs text-white/60">Initial Clashes</div>
+              <div class="text-lg font-extrabold"><span class="counter" data-target="{{ initial_clashes }}">0</span></div>
+            </div>
+            <div class="rounded-2xl bg-emerald-500/10 border border-emerald-400/30 px-4 py-3">
+              <div class="text-xs text-emerald-100/80">Final Clashes</div>
+              <div class="text-lg font-extrabold text-emerald-100"><span class="counter" data-target="{{ final_clashes }}">0</span></div>
+            </div>
+            <div class="col-span-2 rounded-2xl bg-sky-500/10 border border-sky-400/30 px-4 py-3">
+              <div class="text-xs text-sky-100/80">Clash Reduction</div>
+              <div class="text-lg font-extrabold text-sky-100"><span class="counter" data-target="{{ clash_reduction|round(2) }}">0</span>%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <h3 class="font-bold">Initial Random Seating</h3>
+              <span class="text-xs text-white/60">Clashes: <span class="font-semibold text-white/80">{{ initial_clashes }}</span></span>
+            </div>
+            <div class="mt-4 seating-grid" style="--cols: {{ cols }};">
+              {% for seat in baseline.seat_cards %}
+                <div class="seat-card {{ 'seat-clash' if seat.is_clash else '' }} {{ 'seat-empty' if seat.empty else '' }}">
+                  {% if seat.empty %}
+                    <div class="text-xs text-white/40">Empty</div>
+                  {% else %}
+                    <div class="text-sm font-semibold truncate">{{ seat.name }}</div>
+                    <div class="mt-2 inline-flex items-center gap-2">
+                      <span class="subject-dot {{ seat.subject_color }}"></span>
+                      <span class="text-xs text-white/70 truncate">{{ seat.subject }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="rounded-2xl border border-emerald-400/25 bg-emerald-500/5 p-5">
+            <div class="flex items-center justify-between gap-3 flex-wrap">
+              <h3 class="font-bold text-emerald-50">Optimized Seating (GA)</h3>
+              <span class="text-xs text-emerald-100/80">Clashes: <span class="font-semibold text-emerald-100">{{ final_clashes }}</span></span>
+            </div>
+            <div class="mt-4 seating-grid" style="--cols: {{ cols }};">
+              {% for seat in optimized.seat_cards %}
+                <div class="seat-card {{ 'seat-clash' if seat.is_clash else '' }} {{ 'seat-empty' if seat.empty else '' }}">
+                  {% if seat.empty %}
+                    <div class="text-xs text-white/40">Empty</div>
+                  {% else %}
+                    <div class="text-sm font-semibold truncate">{{ seat.name }}</div>
+                    <div class="mt-2 inline-flex items-center gap-2">
+                      <span class="subject-dot {{ seat.subject_color }}"></span>
+                      <span class="text-xs text-white/70 truncate">{{ seat.subject }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      window.__GA_HISTORY__ = {
+        best: {{ history_best|tojson }},
+        avg: {{ history_avg|tojson }},
+      };
+    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>
+

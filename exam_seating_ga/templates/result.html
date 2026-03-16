@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result • Genetic Algorithm Seating Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-950 via-slate-950 to-purple-950 text-white">
+    <main class="relative mx-auto max-w-6xl px-6 py-12">
+      <a href="{{ url_for('input_page') }}" class="text-sm text-white/80 hover:text-white">← Back to input</a>
+      <div class="mt-6 glass rounded-3xl p-8">
+        <h1 class="text-2xl md:text-3xl font-extrabold">Optimized Seating Result</h1>
+        <p class="mt-2 text-sm text-white/70">
+          This page is kept for the required project structure. The full visualization is shown on the simulation page after you run the GA.
+        </p>
+        <div class="mt-6">
+          <a href="{{ url_for('input_page') }}" class="btn-primary">Run Again</a>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+

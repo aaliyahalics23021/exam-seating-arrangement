@@ -16,19 +16,19 @@ An AI-powered web application that uses a **Genetic Algorithm (GA)** to generate
 
 🏠 Home Page
 
-![Home](images/home.png)
+![Home](exam_seating_ga/images/home.png)
 
 ⚙️ Input Setup
 
-![Input Setup](images/input.png)
+![Input Setup](exam_seating_ga/images/input.png)
 
 📈 Population Evolution
 
-![Population Evolution](images/evolution.png)
+![Population Evolution](exam_seating_ga/images/evolution.png)
 
 🪑 Random vs Optimized Seating
 
-![Optimized Seating](images/result.png)
+![Optimized Seating](exam_seating_ga/images/result.png)
 
 
 ⚙️ Tech Stack
